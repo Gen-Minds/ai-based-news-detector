@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Fake News Detector</title>
+  
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Background styling -->
+  <style>
+    body {
+      background: url('https://img.freepik.com/free-photo/artificial-intelligence-concept-collage_23-2150400675.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .overlay {
+      background: rgba(0, 0, 0, 0.6); /* transparent dark overlay */
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="font-sans transition-colors duration-500" id="app">
+  <div class="overlay min-h-screen flex flex-col items-center justify-center px-4">
+
+    <!-- Header with Toggle -->
+    <div class="flex justify-between items-center w-full max-w-4xl mb-6">
+      <h1 class="text-4xl font-bold text-white dark:text-gray-100 fade-in">
+        📰 AI Fake News Detector
+      </h1>
+      
+      <!-- Theme Toggle -->
+      <button onclick="toggleTheme()" 
+        class="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 dark:bg-yellow-400 dark:text-black transition duration-300">
+        Toggle Theme
+      </button>
+    </div>
+
+    <!-- Card -->
+    <div class="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 fade-in">
+      <form method="POST" class="flex flex-col space-y-6">
+        <textarea 
+          name="news" 
+          placeholder="Paste your news article or headline here..." 
+          class="w-full h-40 p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 focus:outline-none focus:ring-4 focus:ring-blue-500 transition resize-none">
+        </textarea>
+        
+        <button 
+          type="submit" 
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg shadow-lg transform hover:scale-105 transition-all duration-300">
+          🔍 Check News
+        </button>
+      </form>
+
+      {% if prediction %}
+      <div class="mt-6 text-center fade-in">
+        <h2 class="text-2xl font-bold 
+          {% if prediction == 'REAL' %} text-green-500 {% else %} text-red-500 {% endif %}">
+          {{ prediction }}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Our AI model analyzed your input.</p>
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- Footer -->
+    <p class="mt-6 text-gray-300 text-sm">⚡ Powered by HuggingFace + BERT | Built with ❤</p>
+  </div>
+
+  <!-- Dark/Light Theme Toggle Script -->
+  <script>
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+    }
+  </script>
+</body>
+</html>

@@ -1,25 +1,48 @@
-from flask import Flask, render_template, request
+import streamlit as st
+import pickle
+import re
 
-app = Flask(__name__)
+# Load model & vectorizer
+with open("model.pkl", "rb") as f:
+    model = pickle.load(f)
 
-# Simple fake news keywords (for demo purposes)
-fake_keywords = ["aliens", "cancer cure", "time travel", "ban internet", "underground base"]
+with open("vectorizer.pkl", "rb") as f:
+    vectorizer = pickle.load(f)
 
-@app.route("/", methods=["GET", "POST"])
-def home():
-    prediction = None
-    news_text = ""
+# Function to clean text (make sure this matches training preprocessing)
+def clean_text(text):
+    text = re.sub(r"http\S+", "", text)  # remove URLs
+    text = re.sub(r"[^a-zA-Z]", " ", text)  # remove non-letters
+    text = text.lower().strip()
+    return text
 
-    if request.method == "POST":
-        news_text = request.form["news"].lower()
-        if news_text.strip() != "":
-            # simple keyword check
-            if any(word in news_text for word in fake_keywords):
-                prediction = "❌ Fake News"
-            else:
-                prediction = "✅ Real News"
+# Streamlit UI
+st.title("📰 AI-Powered Fake News Detector")
+st.write("Enter any news text and check if it's *Fake* or *Real*")
 
-    return render_template("index.html", prediction=prediction, news_text=news_text)
+# User input
+user_input = st.text_area("Paste your news article here:")
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if st.button("Check News"):
+    if user_input.strip() == "":
+        st.warning("⚠ Please enter some text first!")
+    else:
+        # Preprocess & vectorize
+        cleaned = clean_text(user_input)
+        vectorized = vectorizer.transform([cleaned])
+
+        # Make prediction
+        prediction = model.predict(vectorized)[0]
+
+        # Show result
+        if prediction == 0:
+            st.error("🚨 This looks like *Fake News*")
+        elif prediction == 1:
+            st.success("✅ This looks like *Real News*")
+        else:
+            st.info(f"Model returned: {prediction}")
+
+        # Optional: Show prediction probabilities if supported
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(vectorized)[0]
+            st.write(f"🔍 Confidence - Fake: {proba[0]:.2f}, Real: {proba[1]:.2f}")

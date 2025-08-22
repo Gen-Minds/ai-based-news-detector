@@ -1,6 +1,5 @@
 streamlit
-requests
-beautifulsoup4
-transformers
-torch
 scikit-learn
+joblib
+pandas
+numpy
